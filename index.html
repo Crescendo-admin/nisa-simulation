@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0062)file:///Users/kawaharakazuya/Downloads/nisa_simulation_v3.html -->
-<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NISA 資産推移シミュレーション</title>
-<script src="./NISA 資産推移シミュレーション_files/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
 
@@ -213,13 +213,13 @@
 <div class="summary-cards">
   <div class="summary-card" style="border-color:rgba(88,166,255,0.3)">
     <div class="sc-label">A：特定口座保持＋NISA積立（20年後・税引後）</div>
-    <div class="sc-main" id="sumA" style="color:var(--blue)">約1.1億円</div>
-    <div class="sc-sub" id="sumASub">特定口座：約283万（税引後）＋ NISA：約11,003万</div>
+    <div class="sc-main" id="sumA" style="color:var(--blue)">—</div>
+    <div class="sc-sub" id="sumASub">計算中...</div>
   </div>
   <div class="summary-card" style="border-color:rgba(63,185,80,0.3)">
     <div class="sc-label">B：売却→NISA一括（20年後・全額非課税）</div>
-    <div class="sc-main" id="sumB" style="color:var(--green)">約1.1億円</div>
-    <div class="sc-sub" id="sumBSub">差額：約＋35万円（Bが有利）</div>
+    <div class="sc-main" id="sumB" style="color:var(--green)">—</div>
+    <div class="sc-sub" id="sumBSub">計算中...</div>
   </div>
 </div>
 
@@ -227,7 +227,7 @@
 <div class="chart-container">
   <div class="chart-title">税引後 実質資産推移（万円）</div>
   <div class="chart-wrap">
-    <canvas id="mainChart" width="2614" height="600" style="display: block; box-sizing: border-box; height: 300px; width: 1307px;"></canvas>
+    <canvas id="mainChart"></canvas>
   </div>
   <div class="legend">
     <div class="legend-item">
@@ -245,7 +245,7 @@
 <div class="chart-container">
   <div class="chart-title">B−A 差額推移（万円）</div>
   <div class="chart-wrap" style="height:180px">
-    <canvas id="diffChart" width="2614" height="360" style="display: block; box-sizing: border-box; height: 180px; width: 1307px;"></canvas>
+    <canvas id="diffChart"></canvas>
   </div>
 </div>
 
@@ -264,171 +264,13 @@
         <th>差額 B−A</th>
       </tr>
     </thead>
-    <tbody id="tableBody"><tr>
-      <td>1年目</td>
-      <td>150万</td>
-      <td style="color:var(--orange)">-2万</td>
-      <td>367万</td>
-      <td style="color:var(--blue)">514万</td>
-      <td style="color:var(--green)">515万</td>
-      <td class="pos">+1万</td>
-    </tr><tr>
-      <td>2年目</td>
-      <td>156万</td>
-      <td style="color:var(--orange)">-4万</td>
-      <td>748万</td>
-      <td style="color:var(--blue)">901万</td>
-      <td style="color:var(--green)">903万</td>
-      <td class="pos">+2万</td>
-    </tr><tr>
-      <td>3年目</td>
-      <td>162万</td>
-      <td style="color:var(--orange)">-5万</td>
-      <td>1,145万</td>
-      <td style="color:var(--blue)">1,303万</td>
-      <td style="color:var(--green)">1,307万</td>
-      <td class="pos">+4万</td>
-    </tr><tr>
-      <td>4年目</td>
-      <td>169万</td>
-      <td style="color:var(--orange)">-6万</td>
-      <td>1,559万</td>
-      <td style="color:var(--blue)">1,722万</td>
-      <td style="color:var(--green)">1,726万</td>
-      <td class="pos">+4万</td>
-    </tr><tr>
-      <td>5年目</td>
-      <td>176万</td>
-      <td style="color:var(--orange)">-8万</td>
-      <td>1,989万</td>
-      <td style="color:var(--blue)">2,157万</td>
-      <td style="color:var(--green)">2,163万</td>
-      <td class="pos">+6万</td>
-    </tr><tr>
-      <td>6年目</td>
-      <td>183万</td>
-      <td style="color:var(--orange)">-9万</td>
-      <td>2,437万</td>
-      <td style="color:var(--blue)">2,611万</td>
-      <td style="color:var(--green)">2,618万</td>
-      <td class="pos">+7万</td>
-    </tr><tr>
-      <td>7年目</td>
-      <td>190万</td>
-      <td style="color:var(--orange)">-11万</td>
-      <td>2,903万</td>
-      <td style="color:var(--blue)">3,083万</td>
-      <td style="color:var(--green)">3,092万</td>
-      <td class="pos">+9万</td>
-    </tr><tr>
-      <td>8年目</td>
-      <td>198万</td>
-      <td style="color:var(--orange)">-12万</td>
-      <td>3,388万</td>
-      <td style="color:var(--blue)">3,574万</td>
-      <td style="color:var(--green)">3,584万</td>
-      <td class="pos">+10万</td>
-    </tr><tr>
-      <td>9年目</td>
-      <td>206万</td>
-      <td style="color:var(--orange)">-14万</td>
-      <td>3,892万</td>
-      <td style="color:var(--blue)">4,085万</td>
-      <td style="color:var(--green)">4,097万</td>
-      <td class="pos">+12万</td>
-    </tr><tr>
-      <td>10年目</td>
-      <td>215万</td>
-      <td style="color:var(--orange)">-15万</td>
-      <td>4,417万</td>
-      <td style="color:var(--blue)">4,617万</td>
-      <td style="color:var(--green)">4,630万</td>
-      <td class="pos">+13万</td>
-    </tr><tr>
-      <td>11年目</td>
-      <td>223万</td>
-      <td style="color:var(--orange)">-17万</td>
-      <td>4,964万</td>
-      <td style="color:var(--blue)">5,170万</td>
-      <td style="color:var(--green)">5,186万</td>
-      <td class="pos">+16万</td>
-    </tr><tr>
-      <td>12年目</td>
-      <td>233万</td>
-      <td style="color:var(--orange)">-19万</td>
-      <td>5,533万</td>
-      <td style="color:var(--blue)">5,746万</td>
-      <td style="color:var(--green)">5,764万</td>
-      <td class="pos">+18万</td>
-    </tr><tr>
-      <td>13年目</td>
-      <td>242万</td>
-      <td style="color:var(--orange)">-21万</td>
-      <td>6,125万</td>
-      <td style="color:var(--blue)">6,346万</td>
-      <td style="color:var(--green)">6,365万</td>
-      <td class="pos">+19万</td>
-    </tr><tr>
-      <td>14年目</td>
-      <td>252万</td>
-      <td style="color:var(--orange)">-23万</td>
-      <td>6,741万</td>
-      <td style="color:var(--blue)">6,970万</td>
-      <td style="color:var(--green)">6,991万</td>
-      <td class="pos">+21万</td>
-    </tr><tr>
-      <td>15年目</td>
-      <td>262万</td>
-      <td style="color:var(--orange)">-25万</td>
-      <td>7,383万</td>
-      <td style="color:var(--blue)">7,620万</td>
-      <td style="color:var(--green)">7,643万</td>
-      <td class="pos">+23万</td>
-    </tr><tr>
-      <td>16年目</td>
-      <td>273万</td>
-      <td style="color:var(--orange)">-27万</td>
-      <td>8,050万</td>
-      <td style="color:var(--blue)">8,296万</td>
-      <td style="color:var(--green)">8,321万</td>
-      <td class="pos">+25万</td>
-    </tr><tr>
-      <td>17年目</td>
-      <td>284万</td>
-      <td style="color:var(--orange)">-30万</td>
-      <td>8,745万</td>
-      <td style="color:var(--blue)">8,999万</td>
-      <td style="color:var(--green)">9,027万</td>
-      <td class="pos">+28万</td>
-    </tr><tr>
-      <td>18年目</td>
-      <td>295万</td>
-      <td style="color:var(--orange)">-32万</td>
-      <td>9,468万</td>
-      <td style="color:var(--blue)">9,731万</td>
-      <td style="color:var(--green)">9,761万</td>
-      <td class="pos">+30万</td>
-    </tr><tr>
-      <td>19年目</td>
-      <td>308万</td>
-      <td style="color:var(--orange)">-34万</td>
-      <td>10,220万</td>
-      <td style="color:var(--blue)">10,493万</td>
-      <td style="color:var(--green)">10,525万</td>
-      <td class="pos">+32万</td>
-    </tr><tr>
-      <td>20年目</td>
-      <td>320万</td>
-      <td style="color:var(--orange)">-37万</td>
-      <td>11,003万</td>
-      <td style="color:var(--blue)">11,286万</td>
-      <td style="color:var(--green)">11,321万</td>
-      <td class="pos">+35万</td>
-    </tr></tbody>
+    <tbody id="tableBody"></tbody>
   </table>
 </div>
 
-<div class="note" id="noteBox"><strong>ポイント</strong>：20年を通じてBが有利な結果です。</div>
+<div class="note" id="noteBox">
+  <strong>ポイント</strong>：計算中...
+</div>
 
 <script>
 // Fixed params
@@ -661,6 +503,5 @@ update();
 document.getElementById('rateSlider').addEventListener('input', update);
 document.getElementById('contribSlider').addEventListener('input', update);
 </script>
-
-
-</body></html>
+</body>
+</html>
