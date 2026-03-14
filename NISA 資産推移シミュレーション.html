@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///Users/kawaharakazuya/Downloads/nisa_simulation_v3.html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NISA 資産推移シミュレーション</title>
+<script src="./NISA 資産推移シミュレーション_files/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --orange: #f78166;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 28px 20px;
+  }
+
+  .header { margin-bottom: 24px; }
+  .header .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--blue);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header h1 { font-size: 20px; font-weight: 500; }
+  .header .sub { font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.6; }
+
+  /* ---- Controls ---- */
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .controls-title {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .control-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .control-item label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .control-item label .val-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--blue);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    opacity: 0.6;
+  }
+
+  /* ---- Summary cards ---- */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .summary-card .sc-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.5; }
+  .summary-card .sc-main { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .summary-card .sc-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* ---- Charts ---- */
+  .chart-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .chart-title { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 16px; }
+  .chart-wrap { position: relative; height: 300px; }
+
+  .legend { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+  .legend-line { width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ---- Table ---- */
+  .table-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .table-header { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 500; color: var(--text-muted); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    padding: 9px 14px; text-align: right; font-weight: 400;
+    color: var(--text-muted); font-size: 11px;
+    border-bottom: 1px solid var(--border); background: var(--surface2);
+  }
+  th:first-child { text-align: center; }
+  td {
+    padding: 9px 14px; text-align: right;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text);
+  }
+  td:first-child { text-align: center; color: var(--text-muted); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .pos { color: var(--green); }
+  .neg { color: var(--orange); }
+
+  .note {
+    background: rgba(88,166,255,0.05);
+    border: 1px solid rgba(88,166,255,0.15);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .note strong { color: var(--blue); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="label">NISA インタラクティブ シミュレーション · 20年</div>
+  <h1>特定口座保持 vs 売却・NISA買い直し</h1>
+  <p class="sub">税引後の実質手取りベースで比較。特定口座は売却時に含み益へ約20.315%課税。</p>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <div class="controls-title">パラメータ設定</div>
+  <div class="control-grid">
+    <div class="control-item">
+      <label>
+        <span>年利（両口座共通）</span>
+        <span class="val-display" id="rateDisplay">4.0%</span>
+      </label>
+      <input type="range" id="rateSlider" min="1" max="10" step="0.5" value="4">
+      <div class="range-labels"><span>1%</span><span>5%</span><span>10%</span></div>
+    </div>
+    <div class="control-item">
+      <label>
+        <span>毎月積立額（NISA）</span>
+        <span class="val-display" id="contribDisplay">30万円</span>
+      </label>
+      <input type="range" id="contribSlider" min="1" max="100" step="1" value="30">
+      <div class="range-labels"><span>1万</span><span>50万</span><span>100万</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="summary-cards">
+  <div class="summary-card" style="border-color:rgba(88,166,255,0.3)">
+    <div class="sc-label">A：特定口座保持＋NISA積立（20年後・税引後）</div>
+    <div class="sc-main" id="sumA" style="color:var(--blue)">約1.1億円</div>
+    <div class="sc-sub" id="sumASub">特定口座：約283万（税引後）＋ NISA：約11,003万</div>
+  </div>
+  <div class="summary-card" style="border-color:rgba(63,185,80,0.3)">
+    <div class="sc-label">B：売却→NISA一括（20年後・全額非課税）</div>
+    <div class="sc-main" id="sumB" style="color:var(--green)">約1.1億円</div>
+    <div class="sc-sub" id="sumBSub">差額：約＋35万円（Bが有利）</div>
+  </div>
+</div>
+
+<!-- Main chart -->
+<div class="chart-container">
+  <div class="chart-title">税引後 実質資産推移（万円）</div>
+  <div class="chart-wrap">
+    <canvas id="mainChart" width="2614" height="600" style="display: block; box-sizing: border-box; height: 300px; width: 1307px;"></canvas>
+  </div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-line" style="background:var(--blue)"></div>
+      <span>A：特定口座保持＋NISA積立（税引後）</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-line" style="background: repeating-linear-gradient(90deg,#3fb950 0,#3fb950 6px,transparent 6px,transparent 10px)"></div>
+      <span>B：売却→NISA全額運用</span>
+    </div>
+  </div>
+</div>
+
+<!-- Diff chart -->
+<div class="chart-container">
+  <div class="chart-title">B−A 差額推移（万円）</div>
+  <div class="chart-wrap" style="height:180px">
+    <canvas id="diffChart" width="2614" height="360" style="display: block; box-sizing: border-box; height: 180px; width: 1307px;"></canvas>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="table-container">
+  <div class="table-header">年別 詳細データ（税引後）</div>
+  <table>
+    <thead>
+      <tr>
+        <th>経過年</th>
+        <th>A：特定口座（税前）</th>
+        <th>A：課税額</th>
+        <th>A：NISA残高</th>
+        <th>A：合計（税引後）</th>
+        <th>B：NISA合計</th>
+        <th>差額 B−A</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"><tr>
+      <td>1年目</td>
+      <td>150万</td>
+      <td style="color:var(--orange)">-2万</td>
+      <td>367万</td>
+      <td style="color:var(--blue)">514万</td>
+      <td style="color:var(--green)">515万</td>
+      <td class="pos">+1万</td>
+    </tr><tr>
+      <td>2年目</td>
+      <td>156万</td>
+      <td style="color:var(--orange)">-4万</td>
+      <td>748万</td>
+      <td style="color:var(--blue)">901万</td>
+      <td style="color:var(--green)">903万</td>
+      <td class="pos">+2万</td>
+    </tr><tr>
+      <td>3年目</td>
+      <td>162万</td>
+      <td style="color:var(--orange)">-5万</td>
+      <td>1,145万</td>
+      <td style="color:var(--blue)">1,303万</td>
+      <td style="color:var(--green)">1,307万</td>
+      <td class="pos">+4万</td>
+    </tr><tr>
+      <td>4年目</td>
+      <td>169万</td>
+      <td style="color:var(--orange)">-6万</td>
+      <td>1,559万</td>
+      <td style="color:var(--blue)">1,722万</td>
+      <td style="color:var(--green)">1,726万</td>
+      <td class="pos">+4万</td>
+    </tr><tr>
+      <td>5年目</td>
+      <td>176万</td>
+      <td style="color:var(--orange)">-8万</td>
+      <td>1,989万</td>
+      <td style="color:var(--blue)">2,157万</td>
+      <td style="color:var(--green)">2,163万</td>
+      <td class="pos">+6万</td>
+    </tr><tr>
+      <td>6年目</td>
+      <td>183万</td>
+      <td style="color:var(--orange)">-9万</td>
+      <td>2,437万</td>
+      <td style="color:var(--blue)">2,611万</td>
+      <td style="color:var(--green)">2,618万</td>
+      <td class="pos">+7万</td>
+    </tr><tr>
+      <td>7年目</td>
+      <td>190万</td>
+      <td style="color:var(--orange)">-11万</td>
+      <td>2,903万</td>
+      <td style="color:var(--blue)">3,083万</td>
+      <td style="color:var(--green)">3,092万</td>
+      <td class="pos">+9万</td>
+    </tr><tr>
+      <td>8年目</td>
+      <td>198万</td>
+      <td style="color:var(--orange)">-12万</td>
+      <td>3,388万</td>
+      <td style="color:var(--blue)">3,574万</td>
+      <td style="color:var(--green)">3,584万</td>
+      <td class="pos">+10万</td>
+    </tr><tr>
+      <td>9年目</td>
+      <td>206万</td>
+      <td style="color:var(--orange)">-14万</td>
+      <td>3,892万</td>
+      <td style="color:var(--blue)">4,085万</td>
+      <td style="color:var(--green)">4,097万</td>
+      <td class="pos">+12万</td>
+    </tr><tr>
+      <td>10年目</td>
+      <td>215万</td>
+      <td style="color:var(--orange)">-15万</td>
+      <td>4,417万</td>
+      <td style="color:var(--blue)">4,617万</td>
+      <td style="color:var(--green)">4,630万</td>
+      <td class="pos">+13万</td>
+    </tr><tr>
+      <td>11年目</td>
+      <td>223万</td>
+      <td style="color:var(--orange)">-17万</td>
+      <td>4,964万</td>
+      <td style="color:var(--blue)">5,170万</td>
+      <td style="color:var(--green)">5,186万</td>
+      <td class="pos">+16万</td>
+    </tr><tr>
+      <td>12年目</td>
+      <td>233万</td>
+      <td style="color:var(--orange)">-19万</td>
+      <td>5,533万</td>
+      <td style="color:var(--blue)">5,746万</td>
+      <td style="color:var(--green)">5,764万</td>
+      <td class="pos">+18万</td>
+    </tr><tr>
+      <td>13年目</td>
+      <td>242万</td>
+      <td style="color:var(--orange)">-21万</td>
+      <td>6,125万</td>
+      <td style="color:var(--blue)">6,346万</td>
+      <td style="color:var(--green)">6,365万</td>
+      <td class="pos">+19万</td>
+    </tr><tr>
+      <td>14年目</td>
+      <td>252万</td>
+      <td style="color:var(--orange)">-23万</td>
+      <td>6,741万</td>
+      <td style="color:var(--blue)">6,970万</td>
+      <td style="color:var(--green)">6,991万</td>
+      <td class="pos">+21万</td>
+    </tr><tr>
+      <td>15年目</td>
+      <td>262万</td>
+      <td style="color:var(--orange)">-25万</td>
+      <td>7,383万</td>
+      <td style="color:var(--blue)">7,620万</td>
+      <td style="color:var(--green)">7,643万</td>
+      <td class="pos">+23万</td>
+    </tr><tr>
+      <td>16年目</td>
+      <td>273万</td>
+      <td style="color:var(--orange)">-27万</td>
+      <td>8,050万</td>
+      <td style="color:var(--blue)">8,296万</td>
+      <td style="color:var(--green)">8,321万</td>
+      <td class="pos">+25万</td>
+    </tr><tr>
+      <td>17年目</td>
+      <td>284万</td>
+      <td style="color:var(--orange)">-30万</td>
+      <td>8,745万</td>
+      <td style="color:var(--blue)">8,999万</td>
+      <td style="color:var(--green)">9,027万</td>
+      <td class="pos">+28万</td>
+    </tr><tr>
+      <td>18年目</td>
+      <td>295万</td>
+      <td style="color:var(--orange)">-32万</td>
+      <td>9,468万</td>
+      <td style="color:var(--blue)">9,731万</td>
+      <td style="color:var(--green)">9,761万</td>
+      <td class="pos">+30万</td>
+    </tr><tr>
+      <td>19年目</td>
+      <td>308万</td>
+      <td style="color:var(--orange)">-34万</td>
+      <td>10,220万</td>
+      <td style="color:var(--blue)">10,493万</td>
+      <td style="color:var(--green)">10,525万</td>
+      <td class="pos">+32万</td>
+    </tr><tr>
+      <td>20年目</td>
+      <td>320万</td>
+      <td style="color:var(--orange)">-37万</td>
+      <td>11,003万</td>
+      <td style="color:var(--blue)">11,286万</td>
+      <td style="color:var(--green)">11,321万</td>
+      <td class="pos">+35万</td>
+    </tr></tbody>
+  </table>
+</div>
+
+<div class="note" id="noteBox"><strong>ポイント</strong>：20年を通じてBが有利な結果です。</div>
+
+<script>
+// Fixed params
+const CURRENT_VALUE = 1440000;
+const COST_BASIS = CURRENT_VALUE / 1.04;
+const GAIN = CURRENT_VALUE - COST_BASIS;
+const SELL_TAX = GAIN * 0.20315;
+const PROCEEDS = CURRENT_VALUE - SELL_TAX;
+const YEARS = 20;
+const TAX_RATE = 0.20315;
+
+function simulate(annualRate, monthlyContrib) {
+  const mr = annualRate / 12;
+  const months = YEARS * 12;
+  const resultsA = [], resultsB = [];
+
+  let tokutei = CURRENT_VALUE;
+  let nisa_a = 0;
+  let nisa_b = PROCEEDS;
+
+  for (let m = 1; m <= months; m++) {
+    tokutei *= (1 + mr);
+    nisa_a = nisa_a * (1 + mr) + monthlyContrib;
+    nisa_b = nisa_b * (1 + mr) + monthlyContrib;
+
+    if (m % 12 === 0) {
+      const tokutei_gain = tokutei - COST_BASIS;
+      const tokutei_tax = tokutei_gain > 0 ? tokutei_gain * TAX_RATE : 0;
+      const a_net = Math.round((tokutei - tokutei_tax + nisa_a) / 10000);
+      const b_val = Math.round(nisa_b / 10000);
+      resultsA.push({
+        year: m / 12,
+        tokutei_pretax: tokutei,
+        tokutei_tax,
+        nisa_a,
+        a_net
+      });
+      resultsB.push({ year: m / 12, b_val });
+    }
+  }
+  return { resultsA, resultsB };
+}
+
+function fmt(man) {
+  if (man >= 10000) return `約${(man / 10000).toFixed(1)}億円`;
+  return `約${man.toLocaleString()}万円`;
+}
+
+// Chart instances
+let mainChart, diffChart;
+
+function initCharts() {
+  const years = Array.from({length: 20}, (_, i) => `${i+1}年`);
+
+  mainChart = new Chart(document.getElementById('mainChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: 'A：合計（税引後）',
+          data: [],
+          borderColor: '#58a6ff',
+          borderWidth: 3,
+          pointRadius: 4,
+          pointBackgroundColor: '#58a6ff',
+          pointBorderColor: '#0d1117',
+          pointBorderWidth: 1,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: false,
+        },
+        {
+          label: 'B：NISA合計',
+          data: [],
+          borderColor: '#3fb950',
+          borderWidth: 3,
+          borderDash: [8, 4],
+          pointRadius: 4,
+          pointBackgroundColor: '#3fb950',
+          pointBorderColor: '#0d1117',
+          pointBorderWidth: 1,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c2330',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          titleColor: '#e6edf3',
+          bodyColor: '#e6edf3',
+          padding: 12,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y.toLocaleString()}万円`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#8b949e', font: { size: 11 } } },
+        y: {
+          grid: { color: 'rgba(48,54,61,0.5)' },
+          ticks: {
+            color: '#8b949e', font: { size: 11 },
+            callback: v => v >= 10000 ? `${(v/10000).toFixed(0)}億` : `${v}万`
+          }
+        }
+      }
+    }
+  });
+
+  diffChart = new Chart(document.getElementById('diffChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [{
+        label: 'B−A 差額',
+        data: [],
+        backgroundColor: [],
+        borderColor: [],
+        borderWidth: 1,
+        borderRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c2330',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          titleColor: '#e6edf3',
+          bodyColor: '#e6edf3',
+          padding: 12,
+          callbacks: {
+            label: ctx => ` 差額：${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toLocaleString()}万円`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(48,54,61,0.3)' }, ticks: { color: '#8b949e', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(48,54,61,0.3)' }, ticks: { color: '#8b949e', font: { size: 11 }, callback: v => `${v}万` } }
+      }
+    }
+  });
+}
+
+function update() {
+  const annualRate = parseFloat(document.getElementById('rateSlider').value) / 100;
+  const monthlyContrib = parseInt(document.getElementById('contribSlider').value) * 10000;
+
+  document.getElementById('rateDisplay').textContent = `${(annualRate * 100).toFixed(1)}%`;
+  document.getElementById('contribDisplay').textContent = `${monthlyContrib / 10000}万円`;
+
+  const { resultsA, resultsB } = simulate(annualRate, monthlyContrib);
+
+  const a_net_arr = resultsA.map(r => r.a_net);
+  const b_arr = resultsB.map(r => r.b_val);
+  const diff = b_arr.map((v, i) => v - a_net_arr[i]);
+
+  // Update charts
+  mainChart.data.datasets[0].data = a_net_arr;
+  mainChart.data.datasets[1].data = b_arr;
+  mainChart.update();
+
+  diffChart.data.datasets[0].data = diff;
+  diffChart.data.datasets[0].backgroundColor = diff.map(v => v >= 0 ? 'rgba(63,185,80,0.7)' : 'rgba(247,129,102,0.7)');
+  diffChart.data.datasets[0].borderColor = diff.map(v => v >= 0 ? '#3fb950' : '#f78166');
+  diffChart.update();
+
+  // Summary cards
+  const lastA = a_net_arr[19];
+  const lastB = b_arr[19];
+  const lastDiff = diff[19];
+  document.getElementById('sumA').textContent = fmt(lastA);
+  document.getElementById('sumASub').textContent = `特定口座：約${Math.round((resultsA[19].tokutei_pretax - resultsA[19].tokutei_tax)/10000).toLocaleString()}万（税引後）＋ NISA：約${Math.round(resultsA[19].nisa_a/10000).toLocaleString()}万`;
+  document.getElementById('sumB').textContent = fmt(lastB);
+  const diffSign = lastDiff >= 0 ? '＋' : '－';
+  const winner = lastDiff >= 0 ? 'Bが有利' : 'Aが有利';
+  document.getElementById('sumBSub').textContent = `差額：約${diffSign}${Math.abs(lastDiff).toLocaleString()}万円（${winner}）`;
+
+  // Note
+  const crossYear = diff.findIndex(v => v > 0);
+  let noteText = '';
+  if (crossYear <= 0) {
+    noteText = `20年を通じてBが有利な結果です。`;
+  } else if (crossYear >= 19) {
+    noteText = `20年を通じてAが有利な結果です。特定口座の課税繰り延べ効果が大きく出ています。`;
+  } else {
+    noteText = `${crossYear + 1}年目以降にBがAを逆転します。それまでは特定口座の課税繰り延べ効果（売らない限り税を払わない）によりAが上回ります。`;
+  }
+  document.getElementById('noteBox').innerHTML = `<strong>ポイント</strong>：${noteText}`;
+
+  // Table
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  for (let i = 0; i < 20; i++) {
+    const r = resultsA[i];
+    const d = diff[i];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}年目</td>
+      <td>${Math.round(r.tokutei_pretax/10000).toLocaleString()}万</td>
+      <td style="color:var(--orange)">-${Math.round(r.tokutei_tax/10000).toLocaleString()}万</td>
+      <td>${Math.round(r.nisa_a/10000).toLocaleString()}万</td>
+      <td style="color:var(--blue)">${r.a_net.toLocaleString()}万</td>
+      <td style="color:var(--green)">${resultsB[i].b_val.toLocaleString()}万</td>
+      <td class="${d >= 0 ? 'pos' : 'neg'}">${d >= 0 ? '+' : ''}${d.toLocaleString()}万</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// Init
+initCharts();
+update();
+
+document.getElementById('rateSlider').addEventListener('input', update);
+document.getElementById('contribSlider').addEventListener('input', update);
+</script>
+
+
+</body></html>
